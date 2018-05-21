@@ -7,7 +7,8 @@ import {
   ButtonToolbar,
   FormControl,
   Radio,
-  FormGroup
+  FormGroup,
+  Button
 } from "react-bootstrap";
 import Result from "./Result";
 
@@ -26,6 +27,26 @@ class App extends Component {
     };
     this.whatForDropDown = this.whatForDropDown.bind(this);
   };
+
+  handleCreateClick = () =>{
+    var request = require("request");
+    debugger;
+    var resultedThanks ="Thank "+ this.state.thankSelectedOption+" " +this.state.whatForOption+" "+ this.state.whatForSecondOption+" "
+    +"from"+ (this.state.fromSelectedRadio !== "Other" ?this.state.fromSelectedRadio : this.state.otherValue)
+    var options = { method: 'POST',
+      url: 'https://thank-you-card-server.herokuapp.com/thanks',
+      headers: 
+      { 'Content-Type': 'application/json' },
+      body: { title: resultedThanks },
+      json: true };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+
+      console.log(body);
+    });
+
+  }
 
   handleFromChange = (changeEvent) =>{
     this.setState({
@@ -47,7 +68,6 @@ class App extends Component {
   };
 
   whatForDropDown = changeEvent => {
-    debugger;
     this.setState({ whatForOption: changeEvent.target.childNodes['0'].nodeValue  });
   };
 
@@ -58,7 +78,8 @@ class App extends Component {
   ;}
 
   componentDidMount(){
-    var request = require("request");
+    setInterval(() => {
+      var request = require("request");
 
     var options = { method: 'GET',
       url: 'https://thank-you-card-server.herokuapp.com/thanks',
@@ -75,11 +96,11 @@ class App extends Component {
       })
       console.log(body);
     }.bind(this));
+    }, 1000);
 
   }
 
   populateThanksList = () =>{
-    debugger;
     if(this.state.thanksList.length===0){
       return <li>Loading</li>
     }else{
@@ -278,8 +299,12 @@ class App extends Component {
             fromSelectedRadio={this.state.fromSelectedRadio}
             otherValue={this.state.otherValue}
           />
+          <div className="container-title">
+        <Button  onClick={this.handleCreateClick}>Create</Button>
+          </div>
         </div>
-        <ul>
+        <br />
+        <ul className="container-title">
           {this.populateThanksList()}
         </ul>
       </div>

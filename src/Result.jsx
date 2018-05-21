@@ -8,7 +8,7 @@ const Result = ({
     otherValue
 }) => {
   return (
-    <p>
+    <p className="container-title">
       Thank{thankSelectedOption} {whatForOption} {whatForSecondOption}{" "}
       from {fromSelectedRadio !== "Other" ?fromSelectedRadio : otherValue}
     </p>
