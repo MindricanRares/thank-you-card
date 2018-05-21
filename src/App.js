@@ -21,16 +21,18 @@ class App extends Component {
       whatForSecondOption: "not leaving to early",
       fromSelectedRadio: "Your Collegue",
       other:false,
-      otherValue:""
+      otherValue:"",
+      thanksList:[]
     };
-  }
+    this.whatForDropDown = this.whatForDropDown.bind(this);
+  };
 
   handleFromChange = (changeEvent) =>{
     this.setState({
       other:changeEvent.target.value==="Other",
       fromSelectedRadio:changeEvent.target.value
     })
-  }
+  };
 
   handleThankChange = changeEvent => {
     this.setState({
@@ -45,22 +47,53 @@ class App extends Component {
   };
 
   whatForDropDown = changeEvent => {
-    console.log(changeEvent);
-    this.setState({ whatForOption: changeEvent.target.value });
-    console.log(this.state);
+    debugger;
+    this.setState({ whatForOption: changeEvent.target.childNodes['0'].nodeValue  });
   };
-
 
   otherHandleChange = (e) =>{
     this.setState({
       otherValue:e.target.value
     })
+  ;}
+
+  componentDidMount(){
+    var request = require("request");
+
+    var options = { method: 'GET',
+      url: 'https://thank-you-card-server.herokuapp.com/thanks',
+      headers: 
+      {
+  
+        'Content-Type': 'application/json' },
+      json: true };
+
+    request(options, function (error, response, body) {
+      if (error) throw new Error(error);
+      this.setState({
+        thanksList:body
+      })
+      console.log(body);
+    }.bind(this));
+
   }
+
+  populateThanksList = () =>{
+    debugger;
+    if(this.state.thanksList.length===0){
+      return <li>Loading</li>
+    }else{
+      return this.state.thanksList.map(thanks=>{
+        return <li>{thanks.title}</li>
+      })
+    }
+  }
+
   render() {
     return (
       <div className="main-nav">
-        <h1>Welcome to thank-you-card</h1>
-        <h1 className="container-title">Thank</h1>
+        <h1 className="container-title" >Welcome to thank-you-card</h1>
+        <h3 className="container-title" >Thank</h3>
         <div>
           <FormGroup>
             <div className="thankRadioGroup">
@@ -68,9 +101,7 @@ class App extends Component {
                 name="radio-group"
                 checked={this.state.thankSelectedOption === " you"}
                 onChange={this.handleThankChange}
-                value=" you"
-              >
-                {" "}
+                value=" you">
                 you
               </Radio>
               <Radio
@@ -102,17 +133,16 @@ class App extends Component {
           </FormGroup>
         </div>
         <br />
-        <ButtonToolbar className="container-title">
-          <select
-            value={this.state.whatForOption}
-            title="For"
-            id="for_what_dropdown"
-            onChange={this.whatForDropDown}
-          >
-            <option value="for">for</option>
-            <option value="that">that</option>
-          </select>
-        </ButtonToolbar>
+        <div className="container-title">
+          <DropdownButton  
+              title={this.state.whatForOption}
+              id="for_what_dropdown">
+              <MenuItem key="1"value="for" onClick={this.whatForDropDown}>for</MenuItem>
+              <MenuItem key="2"value="that" onClick={this.whatForDropDown}>that</MenuItem>
+            
+          </DropdownButton>
+        </div>
+        
         {this.state.whatForOption === "for" ? (
           <div>
             <FormGroup>
@@ -249,6 +279,9 @@ class App extends Component {
             otherValue={this.state.otherValue}
           />
         </div>
+        <ul>
+          {this.populateThanksList()}
+        </ul>
       </div>
     );
   }
