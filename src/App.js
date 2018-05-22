@@ -105,7 +105,7 @@ class App extends Component {
       return <li>Loading</li>
     }else{
       return this.state.thanksList.map(thanks=>{
-        return <li>{thanks.title}</li>
+        return <li>{thanks}</li>
       })
     }
   }
